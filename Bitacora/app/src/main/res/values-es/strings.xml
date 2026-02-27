@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Bitacora</string>
+    <string name="filter_total">Todas</string>
+    <string name="filter_pending">Pendientes</string>
+    <string name="filter_in_progress">En progreso</string>
+    <string name="filter_in_revision">En revisión</string>
+    <string name="filter_completed">Completadas</string>
+    <string name="filter_rejected">Rechazadas</string>
+    <string name="evidence_type_text">Texto</string>
+    <string name="evidence_type_file">Archivo</string>
+    <string name="badge_pending">Pendiente</string>
+    <string name="badge_in_progress">En progreso</string>
+    <string name="badge_in_revision">En revisión</string>
+    <string name="badge_completed">Completada</string>
+    <string name="badge_rejected">Rechazada</string>
+</resources>

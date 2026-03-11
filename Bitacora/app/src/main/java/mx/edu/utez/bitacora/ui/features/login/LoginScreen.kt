@@ -20,6 +20,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,8 +40,10 @@ import mx.edu.utez.bitacora.data.local.DataStoreManager
 
 @Composable
 fun LoginScreen(
+    viewModel: LoginViewModel,
     onLoginSuccess: () -> Unit
 ) {
+    val state by viewModel.uiState.collectAsState()
     Column(
         modifier = Modifier.statusBarsPadding().fillMaxSize().padding(24.dp),
         verticalArrangement = Arrangement.Center,

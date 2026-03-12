@@ -1,13 +1,15 @@
 package mx.edu.utez.bitacora.data.network
 
 import android.content.Context
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
+import mx.edu.utez.bitacora.data.local.DataStoreManager
 import okhttp3.Interceptor
 import okhttp3.Response
 
-class AuthInterceptor(private val context: Context): Interceptor {
+class AuthInterceptor(private val dataStoreManager: DataStoreManager): Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
-        val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        val token = prefs.getString("auth_token", null)
+        val token = runBlocking { dataStoreManager.tokenFlow.first() }
 
         val requestBuilder = chain.request().newBuilder()
 

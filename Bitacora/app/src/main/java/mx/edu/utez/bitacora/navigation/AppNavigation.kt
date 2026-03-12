@@ -6,7 +6,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -18,6 +20,7 @@ import mx.edu.utez.bitacora.ui.components.LoadingScreen
 import mx.edu.utez.bitacora.ui.features.evidences.EvidenceScreen
 import mx.edu.utez.bitacora.ui.features.home.HomeScreen
 import mx.edu.utez.bitacora.ui.features.login.LoginScreen
+import mx.edu.utez.bitacora.ui.features.login.LoginViewModelFactory
 import mx.edu.utez.bitacora.ui.features.profile.ProfileScreen
 import mx.edu.utez.bitacora.ui.features.tasks.TaskScreen
 
@@ -59,14 +62,12 @@ fun AppNavigation(dataStoreManager: DataStoreManager) {
         ){
             composable("login"){
                 LoginScreen(
-                    onLoginSuccess = {
-                        scope.launch {
-                            dataStoreManager.saveLoginState(true)
-                            navController.navigate(AuthRoutes.Home.route) {
-                                popUpTo("login") { inclusive = true }
-                            }
-                        }
-                    }
+                    viewModel = viewModel(
+                        factory = LoginViewModelFactory(
+                            context = LocalContext.current,
+                            dataStoreManager = dataStoreManager
+                        )
+                    )
                 )
             }
             composable(AuthRoutes.Home.route) {
@@ -85,7 +86,7 @@ fun AppNavigation(dataStoreManager: DataStoreManager) {
             composable(AuthRoutes.Profile.route) {
                 ProfileScreen(onLogout = {
                     scope.launch {
-                        dataStoreManager.saveLoginState(false)
+                        dataStoreManager.clearSession()
                         navController.navigate("login") {
                             popUpTo(AuthRoutes.Home.route) { inclusive = true }
                         }

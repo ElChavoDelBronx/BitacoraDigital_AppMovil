@@ -22,6 +22,8 @@ import mx.edu.utez.bitacora.ui.features.home.HomeScreen
 import mx.edu.utez.bitacora.ui.features.login.LoginScreen
 import mx.edu.utez.bitacora.ui.features.login.LoginViewModelFactory
 import mx.edu.utez.bitacora.ui.features.profile.ProfileScreen
+import mx.edu.utez.bitacora.ui.features.recovery.PasswordRecoveryScreen
+import mx.edu.utez.bitacora.ui.features.recovery.RecoveryViewModelFactory
 import mx.edu.utez.bitacora.ui.features.tasks.TaskScreen
 
 @Composable
@@ -62,9 +64,21 @@ fun AppNavigation(dataStoreManager: DataStoreManager) {
         ){
             composable("login"){
                 LoginScreen(
+                    onNavigate = { route -> navController.navigate(route){
+
+                    }},
                     viewModel = viewModel(
                         factory = LoginViewModelFactory(
                             context = LocalContext.current,
+                            dataStoreManager = dataStoreManager
+                        )
+                    )
+                )
+            }
+            composable("recovery"){
+                PasswordRecoveryScreen(
+                    viewModel = viewModel(
+                        factory = RecoveryViewModelFactory(
                             dataStoreManager = dataStoreManager
                         )
                     )

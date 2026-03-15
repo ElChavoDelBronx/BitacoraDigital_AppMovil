@@ -1,4 +1,4 @@
-package mx.edu.utez.bitacora.data.network
+package mx.edu.utez.bitacora.data.network.responses
 
 data class AuthResponse (
     val token: String,

@@ -1,6 +1,6 @@
 package mx.edu.utez.bitacora.ui.features.login
 
-import mx.edu.utez.bitacora.data.network.AuthResponse
+import mx.edu.utez.bitacora.data.network.responses.AuthResponse
 
 sealed class UiState {
     object Idle: UiState()

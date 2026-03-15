@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,9 +32,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -46,10 +50,12 @@ import kotlinx.coroutines.launch
 import mx.edu.utez.bitacora.R
 import mx.edu.utez.bitacora.data.local.DataStoreManager
 import mx.edu.utez.bitacora.data.network.LoginRequest
+import mx.edu.utez.bitacora.navigation.AuthRoutes
 
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel,
+    onNavigate: (String) -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -122,6 +128,7 @@ fun LoginScreen(
             modifier = Modifier.fillMaxWidth(),
             value = password,
             onValueChange = { password = it },
+            visualTransformation = PasswordVisualTransformation(),
             label = { Text("Contraseña") }
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -131,20 +138,27 @@ fun LoginScreen(
             onClick = {
                 viewModel.login(LoginRequest(email, password))
             },
+            enabled = email.isNotEmpty() && password.isNotEmpty(),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF0B81B7)
+                containerColor = Color(0xFF0B81B7),
+                disabledContainerColor = Color(0xFFF3F4F6),
+                disabledContentColor = Color(0xFF99A1AF)
             )
         ) {
             Text(text = "Iniciar Sesión")
         }
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            textAlign = TextAlign.Center,
-            fontSize = 12.sp,
-            text = "Si no puedes acceder, " +
-                "contacta al administrador del sistema " +
-                    "para restablecer tu contraseña.",
-            color = Color(0xFF4A5565)
-        )
+        Spacer(modifier = Modifier.height(12.dp))
+        Button(
+            contentPadding = PaddingValues.Absolute(),
+            shape = RectangleShape,
+            colors = ButtonDefaults.buttonColors(Color.Transparent),
+            onClick = { onNavigate("recovery") }
+        ) {
+            Text(
+                text = "¿Olvidaste tu contraseña? ¡Recupera el acceso!",
+                fontSize = 14.sp,
+                color = Color(0xFF0B81B7),
+            )
+        }
     }
 }

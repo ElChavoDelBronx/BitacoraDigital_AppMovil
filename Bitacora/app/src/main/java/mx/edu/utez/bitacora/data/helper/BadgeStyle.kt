@@ -3,16 +3,22 @@ package mx.edu.utez.bitacora.data.helper
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import com.google.gson.annotations.SerializedName
 import mx.edu.utez.bitacora.R
 
 /**
  * Enum class utilizada para definir estados de las tareas.
  */
 enum class TaskStatus(){
+    @SerializedName("pending")
     Pending,
+    @SerializedName("in_progress")
     InProgress,
+    @SerializedName("in_revision")
     InRevision,
+    @SerializedName("completed")
     Completed,
+    @SerializedName("rejected")
     Rejected
 }
 

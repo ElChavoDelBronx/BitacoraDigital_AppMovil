@@ -4,3 +4,8 @@ data class GeneralResponse<T> (
     val message: String,
     val data: T?
 )
+
+data class DataResponse<T> (
+    val message: String,
+    val data: T
+)

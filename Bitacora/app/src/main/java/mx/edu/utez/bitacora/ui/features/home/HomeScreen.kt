@@ -35,40 +35,6 @@ import mx.edu.utez.bitacora.navigation.AuthRoutes
 fun HomeScreen(
     onNavigate: (String) -> Unit
 ) {
-    val tasks = listOf(
-        Task(
-            title = "Diseñar base de datos relacional",
-            status = TaskStatus.Completed,
-            dueDate = "19/02/2026",
-            subTask = listOf(
-                Subtask(isDone = true), Subtask(isDone = true), Subtask(isDone = true)
-            )
-        ),
-        Task(
-            title = "Desarrollar API REST de inscripción",
-            status = TaskStatus.InProgress,
-            dueDate = "04/03/2026",
-            subTask = listOf(
-                Subtask(isDone = true), Subtask(), Subtask()
-            )
-        ),
-        Task(
-            title = "Pruebas unitarias del módulo",
-            status = TaskStatus.InProgress,
-            dueDate = "14/03/2026",
-            subTask = listOf(
-                Subtask(), Subtask(), Subtask()
-            )
-        ),
-        Task(
-            title = "Encuesta de satisfacción",
-            status = TaskStatus.InProgress,
-            dueDate = "09/03/2026",
-            subTask = listOf(
-                Subtask(isDone = true), Subtask(), Subtask()
-            )
-        )
-    )
     val scrollSate = rememberScrollState()
     Column(
         modifier = Modifier.statusBarsPadding()
@@ -155,8 +121,6 @@ fun HomeScreen(
                     )
                 }
             }
-            TaskCard(tasks[0])
-            TaskCard(tasks[1])
         }
     }
 }

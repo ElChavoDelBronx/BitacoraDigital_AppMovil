@@ -8,10 +8,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,42 +34,9 @@ import mx.edu.utez.bitacora.ui.features.tasks.components.TaskList
 
 
 @Composable
-fun TaskScreen() {
+fun TaskScreen(viewModel: TaskViewModel) {
     var filterTaskName by remember { mutableStateOf("") }
-    val tasks = listOf(
-        Task(
-            title = "Diseñar base de datos relacional",
-            status = TaskStatus.Completed,
-            dueDate = "19/02/2026",
-            subTask = listOf(
-                Subtask(isDone = true), Subtask(isDone = true), Subtask(isDone = true)
-            )
-        ),
-        Task(
-            title = "Desarrollar API REST de inscripción",
-            status = TaskStatus.InProgress,
-            dueDate = "04/03/2026",
-            subTask = listOf(
-                Subtask(isDone = true), Subtask(), Subtask()
-            )
-        ),
-        Task(
-            title = "Pruebas unitarias del módulo",
-            status = TaskStatus.Pending,
-            dueDate = "14/03/2026",
-            subTask = listOf(
-                Subtask(), Subtask(), Subtask()
-            )
-        ),
-        Task(
-            title = "Encuesta de satisfacción",
-            status = TaskStatus.InProgress,
-            dueDate = "09/03/2026",
-            subTask = listOf(
-                Subtask(isDone = true), Subtask(), Subtask()
-            )
-        )
-    )
+
     Column(
         modifier = Modifier.statusBarsPadding()
             .fillMaxWidth()
@@ -98,13 +68,11 @@ fun TaskScreen() {
         Spacer(modifier = Modifier.height(12.dp))
         FilterLazyRow()
         Spacer(modifier = Modifier.height(24.dp))
-        TaskList(tasks);
+        if(viewModel.isLoading) {
+            CircularProgressIndicator()
+        } else {
+            TaskList(viewModel.tasks);
+        }
 
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewTaskScreen(){
-    TaskScreen()
 }

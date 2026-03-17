@@ -23,7 +23,11 @@ class LoginViewModel(
                 val response = apiService.login(request)
                 if(response.isSuccessful && response.body() != null) {
                     val token = response.body()!!.token
+                    val userId = response.body()!!.userId
+                    val userName = response.body()!!.userName
                     dataStoreManager.saveToken(token)
+                    dataStoreManager.saveUserId(userId)
+                    dataStoreManager.saveUserName(userName)
                     _uiState.value = UiState.Success(response.body()!!)
                 } else {
                     _uiState.value = UiState.Error("Error: ${response.code()}")

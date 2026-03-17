@@ -1,11 +1,15 @@
 package mx.edu.utez.bitacora.data.network
 
+import mx.edu.utez.bitacora.data.model.Task
 import mx.edu.utez.bitacora.data.network.responses.AuthResponse
+import mx.edu.utez.bitacora.data.network.responses.DataResponse
 import mx.edu.utez.bitacora.data.network.responses.GeneralResponse
 import mx.edu.utez.bitacora.ui.features.recovery.data.PasswordResetRequest
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 interface ApiService {
     @POST("api/auth/login")
@@ -19,4 +23,7 @@ interface ApiService {
 
     @POST("api/auth/change-password")
     suspend fun changePassword(@Body request: PasswordResetRequest): Response<AuthResponse>
+
+    @GET("api/tasks/student/{studentId}")
+    suspend fun getTasks(@Path("studentId") idStudent: Long): Response<DataResponse<List<Task>>>
 }

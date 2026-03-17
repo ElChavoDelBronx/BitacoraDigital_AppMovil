@@ -13,6 +13,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,16 +22,30 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mx.edu.utez.bitacora.data.model.Task
 import mx.edu.utez.bitacora.data.helper.toBadgeStyle
+import mx.edu.utez.bitacora.data.model.Subtask
 import mx.edu.utez.bitacora.ui.components.TaskStatusBadge
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+
+fun getSubtaskCount(subtasks: List<Subtask>): Int {
+    var count = 0
+    for(subtask in subtasks){
+        if (subtask.isDone) ++count
+    }
+    return count
+}
 
 @Composable
 fun DetailedTaskCard(
     task: Task
 ) {
-    var doneSubtask = 0
-    for(subtask in task.subTask){
-        if (subtask.isDone) ++doneSubtask else continue
+    val subtaskCount = if (task.subTasks.isEmpty()) "0" else "${getSubtaskCount(task.subTasks)}/${task.subTasks.size}"
+    val formattedDate = remember(task.dueDate) {
+        val date = LocalDate.parse(task.dueDate)
+        date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))
     }
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -52,7 +67,7 @@ fun DetailedTaskCard(
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 modifier = Modifier.align(Alignment.Start),
-                text = "Sistema de gestión escolar",
+                text = task.projectName,
                 color = MaterialTheme.colorScheme.onSecondary,
                 fontSize = 14.sp
             )
@@ -65,12 +80,12 @@ fun DetailedTaskCard(
             ){
                 TaskStatusBadge(task.status.toBadgeStyle())
                 Text(
-                    text = task.dueDate,
+                    text = "$formattedDate",
                     color = MaterialTheme.colorScheme.onSecondary,
                     fontSize = 12.sp
                 )
                 Text(
-                    text = "${doneSubtask}/${task.subTask.size} subtareas",
+                    text = "$subtaskCount subtareas",
                     color = MaterialTheme.colorScheme.onSecondary,
                     fontSize = 12.sp
                 )

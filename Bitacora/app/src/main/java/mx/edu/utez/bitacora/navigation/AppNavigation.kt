@@ -25,6 +25,7 @@ import mx.edu.utez.bitacora.ui.features.profile.ProfileScreen
 import mx.edu.utez.bitacora.ui.features.recovery.PasswordRecoveryScreen
 import mx.edu.utez.bitacora.ui.features.recovery.RecoveryViewModelFactory
 import mx.edu.utez.bitacora.ui.features.tasks.TaskScreen
+import mx.edu.utez.bitacora.ui.features.tasks.TaskViewModelFactory
 
 @Composable
 fun AppNavigation(dataStoreManager: DataStoreManager) {
@@ -92,7 +93,13 @@ fun AppNavigation(dataStoreManager: DataStoreManager) {
                 } })
             }
             composable(AuthRoutes.Tasks.route) {
-                TaskScreen()
+                TaskScreen(
+                    viewModel = viewModel(
+                        factory = TaskViewModelFactory(
+                            dataStoreManager = dataStoreManager
+                        )
+                    )
+                )
             }
             composable(AuthRoutes.Evidences.route) {
                 EvidenceScreen()

@@ -1,6 +1,7 @@
 package mx.edu.utez.bitacora.ui.features.evidences
 
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -27,6 +29,8 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,17 +38,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import mx.edu.utez.bitacora.ui.components.SpinnerDropdown
 import mx.edu.utez.bitacora.R
 import mx.edu.utez.bitacora.ui.features.evidences.components.AttachedFileItem
 import mx.edu.utez.bitacora.ui.components.SelectableButton
 import mx.edu.utez.bitacora.ui.features.evidences.components.InputGroup
+import mx.edu.utez.bitacora.ui.features.evidences.data.EvidenceRequest
 
 enum class EvidenceType(@StringRes val labelRestId: Int){
     Text(R.string.evidence_type_text),
@@ -52,32 +60,27 @@ enum class EvidenceType(@StringRes val labelRestId: Int){
 }
 
 @Composable
-fun EvidenceScreen() {
-    val tasks = listOf(
-        "Diseñar base de datos relacional",
-        "Desarrollar API REST de inscripciones",
-        "Pruebas unitarias del módulo",
-        "Encuestas de satisfacción"
-    )
-    var selectedTask by remember { mutableStateOf("") }
-    var workedHours by remember { mutableStateOf("") }
-    var textEvidence by remember { mutableStateOf("") }
+fun EvidenceScreen(
+    viewModel: EvidenceViewModel
+) {
+    val context = LocalContext.current
+    val state by viewModel.uploadState.collectAsState()
+    val tasks by viewModel.tasks.collectAsState()
+    val formState by viewModel.formUiState.collectAsState()
     val scrollState = rememberScrollState()
-    var selectedInput by remember { mutableStateOf(EvidenceType.File) }
-    var selectedFileUris by remember { mutableStateOf<List<Uri>>(emptyList()) }
     val pickFileLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenMultipleDocuments(),
         onResult = { uris ->
             // Actualiza la lista de uris sin duplicar archivos
-            selectedFileUris = (selectedFileUris + uris).distinct()
+            viewModel.onSelectedFilesChanged(uris)
         }
     )
-    val isSubmittingEnabled = (selectedTask.isNotEmpty() && workedHours.isNotEmpty()) && (
-                textEvidence.isNotEmpty() && selectedInput == EvidenceType.Text
-            ) || (
-                selectedFileUris.isNotEmpty() && selectedInput == EvidenceType.File
-            )
 
+    LaunchedEffect(state) {
+        if(state is UploadState.Error) {
+            Toast.makeText(context, (state as UploadState.Error).message, Toast.LENGTH_SHORT).show()
+        }
+    }
     Column(
         modifier = Modifier.statusBarsPadding()
             .fillMaxWidth()
@@ -94,7 +97,7 @@ fun EvidenceScreen() {
                 
             )
             Text(
-                text = "Texto o archivos adjuntos",
+                text = "Imágenes o archivos adjuntos",
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onSecondary
             )
@@ -104,116 +107,88 @@ fun EvidenceScreen() {
                 text = "Selecciona una tarea",
                 list = tasks,
                 onSelectedItem = { selected ->
-                    selectedTask = selected
+                    viewModel.onSelectedTaskChanged(selected)
                 }
             )
         }
         InputGroup(label = "horas trabajadas") {
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
-                value = workedHours,
-                onValueChange = { workedHours = it },
-                label = { Text(text = "")  }
+                value = formState.workedHours,
+                onValueChange = { newValue ->
+                    if(newValue.all { it.isDigit() } && newValue.length <= 2) viewModel.onWorkedHoursChanged(newValue) },
+                label = { Text(text = "")  },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
         }
-        InputGroup(label = "TIPO DE EVIDENCIA") {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ){
-                SelectableButton(
-                    modifier = Modifier.weight(1f),
-                    text = stringResource(id = EvidenceType.Text.labelRestId),
-                    option = EvidenceType.Text,
-                    selectedOption = selectedInput,
-                    onClick = { selectedInput = it },
-                    icon = painterResource(id = R.drawable.ic_lucide_file_text)
-                )
-                SelectableButton(
-                    modifier = Modifier.weight(1f),
-                    text = stringResource(id = EvidenceType.File.labelRestId),
-                    option = EvidenceType.File,
-                    selectedOption = selectedInput,
-                    onClick = { selectedInput = it },
-                    icon = painterResource(id = R.drawable.ic_lucide_upload)
-                )
-            }
-        }
-        // Alterna entre el input de texto e input de archivos
-        when(selectedInput) {
-            EvidenceType.Text -> {
-                InputGroup(label = "Descripción de la evidencia") {
-                    OutlinedTextField(
-                        value = textEvidence,
-                        onValueChange = { textEvidence = it },
-                        label = { Text(text = "Describe las actividades realizadas o resultados obtenidos.") },
-                        singleLine = false,
-                        modifier = Modifier.fillMaxWidth()
-                            .height(272.dp)
-                    )
-                }
-            }
-            EvidenceType.File -> {
-                InputGroup(label = "Archivos adjuntos") {
-                    // Alterna entre botón para adjuntar el primer archivo y botón para agregar más archivos
-                    if(selectedFileUris.isEmpty()){
-                        OutlinedButton(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(10.dp),
-                            onClick = { pickFileLauncher.launch(
-                                arrayOf("application/pdf", "application/msword", "text/plain", "image/png", "image/jpeg")
-                            ) },
-                            colors = ButtonDefaults.buttonColors(containerColor =  Color.Transparent)
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(24.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(12.dp)
-                            ){
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_lucide_upload),
-                                    contentDescription = null,
-                                    tint = Color(0xFF155DFC)
-                                )
-                                Text(text = "Subir archivos", fontSize = 16.sp)
-                                Text(text = "Imágenes, PDF, documentos", color = MaterialTheme.colorScheme.onTertiary, fontSize = 14.sp)
-                            }
-                        }
-                    } else {
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ){
-                            selectedFileUris.forEach { uri ->
-                              AttachedFileItem(
-                                  fileUri = uri,
-                                  onRemoveClick = {
-                                      selectedFileUris = selectedFileUris - uri
-                                  }
-                              )
-                            }
-                            IconButton(
-                                onClick = { pickFileLauncher.launch(
-                                arrayOf("application/pdf", "application/msword", "text/plain", "image/png", "image/jpeg")
-                                )}
-                            ){
-                                Icon(
-                                    imageVector = Icons.Default.Add,
-                                    contentDescription = "Agregar archivo",
-                                    tint = Color.DarkGray,
-                                    modifier = Modifier.padding(4.dp)
-                                )
-                            }
-
-                        }
+        InputGroup(label = "Archivos adjuntos") {
+            // Alterna entre botón para adjuntar el primer archivo y botón para agregar más archivos
+            if(formState.selectedFileUris.isEmpty()){
+                OutlinedButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(10.dp),
+                    onClick = { pickFileLauncher.launch(
+                        arrayOf("application/pdf", "application/msword", "text/plain", "image/png", "image/jpeg")
+                    ) },
+                    colors = ButtonDefaults.buttonColors(containerColor =  Color.Transparent)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ){
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_lucide_upload),
+                            contentDescription = null,
+                            tint = Color(0xFF155DFC)
+                        )
+                        Text(text = "Subir archivos", fontSize = 16.sp)
+                        Text(text = "Imágenes, PDF, documentos", color = MaterialTheme.colorScheme.onTertiary, fontSize = 14.sp)
                     }
                 }
+            } else {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ){
+                    formState.selectedFileUris.forEach { uri ->
+                      AttachedFileItem(
+                          fileUri = uri,
+                          onRemoveClick = {
+                              viewModel.onRemoveFile(uri)
+                          }
+                      )
+                    }
+                    IconButton(
+                        onClick = { pickFileLauncher.launch(
+                        arrayOf("application/pdf", "application/msword", "text/plain", "image/png", "image/jpeg")
+                        )}
+                    ){
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Agregar archivo",
+                            tint = Color.DarkGray,
+                            modifier = Modifier.padding(4.dp)
+                        )
+                    }
+
+                }
             }
+        }
+        InputGroup(label = "Descripción de la evidencia (opcional)") {
+            OutlinedTextField(
+                value = formState.description,
+                onValueChange = { viewModel.onDescriptionChanged(it) },
+                label = { Text(text = "Describe las actividades realizadas o resultados obtenidos.") },
+                singleLine = false,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
         Button(
             modifier = Modifier.fillMaxWidth(),
-            onClick = { },
-            enabled = isSubmittingEnabled,
+            onClick = {
+                viewModel.uploadAndRegister(context)
+            },
+            enabled = formState.isSubmissionEnabled,
             shape = RoundedCornerShape(10.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFF0B81B7),
@@ -229,9 +204,4 @@ fun EvidenceScreen() {
             Text(text = "Registrar Evidencia")
         }
     }
-}
-@Preview(showBackground = true, backgroundColor = 0xFF000000)
-@Composable
-fun EvidencePreview(){
-    EvidenceScreen()
 }

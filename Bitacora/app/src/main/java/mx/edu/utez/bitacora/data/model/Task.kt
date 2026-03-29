@@ -1,9 +1,11 @@
 package mx.edu.utez.bitacora.data.model
 
 import mx.edu.utez.bitacora.data.helper.TaskStatus
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.util.Date
+
+data class SimpleTask(
+    var id: Long,
+    var title: String
+)
 
 data class Task(
     var id: Long,

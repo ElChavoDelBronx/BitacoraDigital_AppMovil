@@ -16,10 +16,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import mx.edu.utez.bitacora.data.model.SimpleTask
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SpinnerDropdown(text : String, list : List<String>, onSelectedItem : (String) -> Unit ) {
+fun SpinnerDropdown(text : String, list : List<SimpleTask>, onSelectedItem : (SimpleTask) -> Unit ) {
     var expanded by remember { mutableStateOf(false) }
     var selection by remember { mutableStateOf("") }
     ExposedDropdownMenuBox(
@@ -42,12 +43,20 @@ fun SpinnerDropdown(text : String, list : List<String>, onSelectedItem : (String
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
+            if(list.isEmpty()) {
+                DropdownMenuItem(
+                    text = { Text(text = "No hay tareas en progreso") },
+                    onClick = {
+                        expanded = false
+                    }
+                )
+            }
             list.forEach { elemento ->
                 DropdownMenuItem(
-                    text = { Text(text = elemento) },
+                    text = { Text(text = elemento.title) },
                     onClick = {
                         onSelectedItem(elemento)
-                        selection = elemento
+                        selection = elemento.title
                         expanded = false
                     }
                 )

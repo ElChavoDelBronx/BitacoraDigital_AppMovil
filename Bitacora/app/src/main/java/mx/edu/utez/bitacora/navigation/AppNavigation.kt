@@ -18,6 +18,7 @@ import mx.edu.utez.bitacora.data.local.DataStoreManager
 import mx.edu.utez.bitacora.ui.components.BottomNavBar
 import mx.edu.utez.bitacora.ui.components.LoadingScreen
 import mx.edu.utez.bitacora.ui.features.evidences.EvidenceScreen
+import mx.edu.utez.bitacora.ui.features.evidences.EvidenceViewModelFactory
 import mx.edu.utez.bitacora.ui.features.home.HomeScreen
 import mx.edu.utez.bitacora.ui.features.login.LoginScreen
 import mx.edu.utez.bitacora.ui.features.login.LoginViewModelFactory
@@ -102,7 +103,13 @@ fun AppNavigation(dataStoreManager: DataStoreManager) {
                 )
             }
             composable(AuthRoutes.Evidences.route) {
-                EvidenceScreen()
+                EvidenceScreen(
+                    viewModel = viewModel(
+                        factory = EvidenceViewModelFactory(
+                            dataStoreManager = dataStoreManager
+                        )
+                    )
+                )
             }
             composable(AuthRoutes.Profile.route) {
                 ProfileScreen(onLogout = {

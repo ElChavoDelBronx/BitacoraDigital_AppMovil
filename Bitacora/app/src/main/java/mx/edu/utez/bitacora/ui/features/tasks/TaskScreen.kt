@@ -28,13 +28,17 @@ import androidx.compose.ui.unit.sp
 import mx.edu.utez.bitacora.data.model.Subtask
 import mx.edu.utez.bitacora.data.model.Task
 import mx.edu.utez.bitacora.data.helper.TaskStatus
+import mx.edu.utez.bitacora.navigation.AuthRoutes
 import mx.edu.utez.bitacora.ui.features.tasks.components.FilterLazyRow
 import mx.edu.utez.bitacora.ui.features.tasks.components.TaskList
 
 
 
 @Composable
-fun TaskScreen(viewModel: TaskViewModel) {
+fun TaskScreen(
+    viewModel: TaskViewModel,
+    onNavigate: (AuthRoutes) -> Unit
+) {
     var filterTaskName by remember { mutableStateOf("") }
 
     Column(
@@ -71,7 +75,9 @@ fun TaskScreen(viewModel: TaskViewModel) {
         if(viewModel.isLoading) {
             CircularProgressIndicator()
         } else {
-            TaskList(viewModel.tasks);
+            TaskList(viewModel.tasks, onSelectedCard = { selected ->
+                onNavigate(AuthRoutes.TaskDetails(selected.id))
+            });
         }
 
     }

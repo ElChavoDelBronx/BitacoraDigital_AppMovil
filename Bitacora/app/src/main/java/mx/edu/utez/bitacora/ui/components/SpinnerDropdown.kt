@@ -20,9 +20,14 @@ import mx.edu.utez.bitacora.data.model.SimpleTask
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SpinnerDropdown(text : String, list : List<SimpleTask>, onSelectedItem : (SimpleTask) -> Unit ) {
+fun SpinnerDropdown(
+    defaultValue: String,
+    text : String,
+    list : List<SimpleTask>,
+    onSelectedItem : (SimpleTask) -> Unit
+) {
     var expanded by remember { mutableStateOf(false) }
-    var selection by remember { mutableStateOf("") }
+    var selection: String by remember { mutableStateOf(defaultValue) }
     ExposedDropdownMenuBox(
         modifier = Modifier.fillMaxWidth(),
         expanded = expanded,

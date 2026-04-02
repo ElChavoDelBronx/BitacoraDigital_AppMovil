@@ -32,6 +32,9 @@ interface ApiService {
     @GET("api/tasks/in-progress/{studentId}")
     suspend fun getInProgressTasks(@Path("studentId") idStudent: Long): Response<DataResponse<List<SimpleTask>>>
 
+    @GET("api/tasks/{taskId}")
+    suspend fun getTaskById(@Path("taskId") taskId: Long): Response<DataResponse<Task>>
+
     @POST("api/evidences")
     suspend fun saveEvidence(@Body request: EvidenceRequest): Response<GeneralResponse<Unit>>
 }

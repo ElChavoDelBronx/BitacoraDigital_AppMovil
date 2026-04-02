@@ -10,10 +10,18 @@ import androidx.compose.ui.unit.dp
 import mx.edu.utez.bitacora.data.model.Task
 
 @Composable
-fun TaskList(tasks: List<Task>) {
+fun TaskList(
+    tasks: List<Task>,
+    onSelectedCard: (Task) -> Unit
+) {
     LazyColumn {
         items(tasks){task ->
-            DetailedTaskCard(task)
+            DetailedTaskCard(
+                task,
+                onClick = {
+                    onSelectedCard(task)
+                }
+            )
             Spacer(modifier = Modifier.height(12.dp))
         }
     }

@@ -46,6 +46,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import mx.edu.utez.bitacora.ui.components.SpinnerDropdown
 import mx.edu.utez.bitacora.R
@@ -64,9 +65,9 @@ fun EvidenceScreen(
     viewModel: EvidenceViewModel
 ) {
     val context = LocalContext.current
-    val state by viewModel.uploadState.collectAsState()
-    val tasks by viewModel.tasks.collectAsState()
-    val formState by viewModel.formUiState.collectAsState()
+    val state by viewModel.uploadState.collectAsStateWithLifecycle()
+    val tasks by viewModel.tasks.collectAsStateWithLifecycle()
+    val formState by viewModel.formUiState.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
     val pickFileLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenMultipleDocuments(),
@@ -76,7 +77,7 @@ fun EvidenceScreen(
         }
     )
 
-    LaunchedEffect(state) {
+    LaunchedEffect(tasks) {
         if(state is UploadState.Error) {
             Toast.makeText(context, (state as UploadState.Error).message, Toast.LENGTH_SHORT).show()
         }
@@ -94,7 +95,7 @@ fun EvidenceScreen(
                 text = "Registrar Evidencia",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                
+
             )
             Text(
                 text = "Imágenes o archivos adjuntos",
@@ -103,13 +104,18 @@ fun EvidenceScreen(
             )
         }
         InputGroup(label = "TAREA ASOCIADA") {
-            SpinnerDropdown(
-                text = "Selecciona una tarea",
-                list = tasks,
-                onSelectedItem = { selected ->
-                    viewModel.onSelectedTaskChanged(selected)
-                }
-            )
+            if(formState.isDropdownLoading) {
+                Text(text = "Cargando tarea...")
+            } else {
+                SpinnerDropdown(
+                    defaultValue = formState.selectedTask?.title ?: "",
+                    text = "Selecciona una tarea",
+                    list = tasks,
+                    onSelectedItem = { selected ->
+                        viewModel.onSelectedTaskChanged(selected)
+                    }
+                )
+            }
         }
         InputGroup(label = "horas trabajadas") {
             OutlinedTextField(

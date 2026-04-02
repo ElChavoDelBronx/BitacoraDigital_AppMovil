@@ -1,5 +1,6 @@
 package mx.edu.utez.bitacora.ui.features.tasks.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,17 +29,20 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
-fun getSubtaskCount(subtasks: List<Subtask>): Int {
+fun getSubtaskCount(subtasks: List<Subtask>?): Int {
     var count = 0
-    for(subtask in subtasks){
-        if (subtask.isDone) ++count
+    if (subtasks != null) {
+        for(subtask in subtasks){
+            if (subtask.checked) ++count
+        }
     }
     return count
 }
 
 @Composable
 fun DetailedTaskCard(
-    task: Task
+    task: Task,
+    onClick: () -> Unit
 ) {
     val subtaskCount = if (task.subTasks.isEmpty()) "0" else "${getSubtaskCount(task.subTasks)}/${task.subTasks.size}"
     val formattedDate = remember(task.dueDate) {
@@ -47,7 +51,10 @@ fun DetailedTaskCard(
     }
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth()
+            .clickable(
+                onClick = onClick
+            ),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(5.dp),
         shape = RoundedCornerShape(14.dp)

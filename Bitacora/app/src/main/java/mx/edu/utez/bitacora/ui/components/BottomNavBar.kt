@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import mx.edu.utez.bitacora.R
 import mx.edu.utez.bitacora.navigation.AuthRoutes
@@ -19,23 +20,24 @@ fun BottomNavBar(
     navController: NavController,
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
+    val destination = navBackStackEntry?.destination
 
     val items = listOf(
         AuthRoutes.Home,
         AuthRoutes.Tasks,
-        AuthRoutes.Evidences,
+        AuthRoutes.Evidences(),
         AuthRoutes.Profile
     )
 
     NavigationBar{
         items.forEach { screen ->
+            val isSelected = destination?.hasRoute(screen::class) ?: false
             NavigationBarItem(
                 icon = { Icon(painter = painterResource(screen.resIconId), contentDescription = screen.title) },
                 label = { Text(text = screen.title) },
-                selected = currentRoute == screen.route,
+                selected = isSelected,
                 onClick = {
-                    navController.navigate(screen.route) {
+                    navController.navigate(screen) {
                         popUpTo(navController.graph.startDestinationId) {
                             saveState = true
                         }

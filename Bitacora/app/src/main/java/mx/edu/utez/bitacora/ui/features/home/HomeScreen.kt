@@ -33,7 +33,7 @@ import mx.edu.utez.bitacora.navigation.AuthRoutes
 
 @Composable
 fun HomeScreen(
-    onNavigate: (String) -> Unit
+    onNavigate: (AuthRoutes) -> Unit
 ) {
     val scrollSate = rememberScrollState()
     Column(
@@ -112,7 +112,7 @@ fun HomeScreen(
                 Button(
                     contentPadding = PaddingValues.Absolute(),
                     colors = ButtonDefaults.buttonColors(Color.Transparent),
-                    onClick = { onNavigate(AuthRoutes.Tasks.route) }
+                    onClick = { onNavigate(AuthRoutes.Tasks) }
                 ) {
                     Text(
                         text = "Ver todas →",

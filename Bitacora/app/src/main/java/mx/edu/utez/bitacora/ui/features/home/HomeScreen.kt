@@ -12,30 +12,30 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mx.edu.utez.bitacora.ui.features.home.components.StatisticCard
 import mx.edu.utez.bitacora.ui.features.home.components.TaskCard
 import mx.edu.utez.bitacora.R
-import mx.edu.utez.bitacora.data.model.Subtask
-import mx.edu.utez.bitacora.data.model.Task
-import mx.edu.utez.bitacora.data.helper.TaskStatus
 import mx.edu.utez.bitacora.navigation.AuthRoutes
 
 @Composable
 fun HomeScreen(
+    viewModel: HomeViewModel,
     onNavigate: (AuthRoutes) -> Unit
 ) {
     val scrollSate = rememberScrollState()
+    val dashboardInfo by viewModel.dashboardInfo.collectAsStateWithLifecycle()
+    val userName by viewModel.userName.collectAsStateWithLifecycle()
     Column(
         modifier = Modifier.statusBarsPadding()
             .fillMaxWidth()
@@ -46,12 +46,12 @@ fun HomeScreen(
     ){
         Column {
             Text(
-                text = "Hola, Ana",
+                text = "Hola, $userName",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
             )
             Text(
-                text = "Enero - Junio 2026",
+                text = dashboardInfo.activePeriod,
                 fontSize = 14.sp,
             )
         }
@@ -66,14 +66,14 @@ fun HomeScreen(
                     modifier = Modifier.weight(1f),
                     icon = painterResource(id = R.drawable.ic_lucide_list_todo),
                     iconBackgroundColor = Color(0xFF0DA2E7),
-                    count = "6",
+                    count = "${dashboardInfo.stats.totalTasks}",
                     label = "Total Tareas"
                 )
                 StatisticCard(
                     modifier = Modifier.weight(1f),
                     icon = painterResource(id = R.drawable.ic_lucide_circle_check_big),
                     iconBackgroundColor = Color(0xFF2BAB6F),
-                    count = "2",
+                    count = "${dashboardInfo.stats.completedTasks}",
                     label = "Completadas"
                 )
             }
@@ -84,14 +84,14 @@ fun HomeScreen(
                     modifier = Modifier.weight(1f),
                     icon = painterResource(id = R.drawable.ic_lucide_clock),
                     iconBackgroundColor = Color(0xFFFF6900),
-                    count = "60",
+                    count = "${dashboardInfo.stats.validatedHours}",
                     label = "Horas Registradas"
                 )
                 StatisticCard(
                     modifier = Modifier.weight(1f),
                     icon = painterResource(id = R.drawable.ic_lucide_folder_open),
                     iconBackgroundColor = Color(0xFF0B81B7),
-                    count = "2",
+                    count = "${dashboardInfo.stats.inProgressTasks}",
                     label = "En Progreso"
                 )
             }
@@ -121,11 +121,9 @@ fun HomeScreen(
                     )
                 }
             }
+            dashboardInfo.recentTasks.forEach { task ->
+                TaskCard(task)
+            }
         }
     }
-}
-@Preview(showBackground = true)
-@Composable
-fun HomePreview(){
-    HomeScreen(onNavigate = {})
 }

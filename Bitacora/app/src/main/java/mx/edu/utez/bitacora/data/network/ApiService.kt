@@ -6,6 +6,8 @@ import mx.edu.utez.bitacora.data.network.responses.AuthResponse
 import mx.edu.utez.bitacora.data.network.responses.DataResponse
 import mx.edu.utez.bitacora.data.network.responses.GeneralResponse
 import mx.edu.utez.bitacora.ui.features.evidences.data.EvidenceRequest
+import mx.edu.utez.bitacora.ui.features.home.data.StudentDashboard
+import mx.edu.utez.bitacora.ui.features.profile.data.ProfileInfo
 import mx.edu.utez.bitacora.ui.features.recovery.data.PasswordResetRequest
 import retrofit2.Response
 import retrofit2.http.Body
@@ -26,6 +28,9 @@ interface ApiService {
     @POST("api/auth/change-password")
     suspend fun changePassword(@Body request: PasswordResetRequest): Response<AuthResponse>
 
+    @GET("api/dashboards/student/{studentId}")
+    suspend fun getDashboardInfo(@Path("studentId") idStudent: Long): Response<DataResponse<StudentDashboard>>
+
     @GET("api/tasks/student/{studentId}")
     suspend fun getTasks(@Path("studentId") idStudent: Long): Response<DataResponse<List<Task>>>
 
@@ -37,4 +42,7 @@ interface ApiService {
 
     @POST("api/evidences")
     suspend fun saveEvidence(@Body request: EvidenceRequest): Response<GeneralResponse<Unit>>
+
+    @GET("api/profile/student/{studentId}")
+    suspend fun getStudentProfile(@Path("studentId") idStudent: Long): Response<DataResponse<ProfileInfo>>
 }

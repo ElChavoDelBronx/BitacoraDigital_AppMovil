@@ -22,9 +22,11 @@ import mx.edu.utez.bitacora.ui.components.LoadingScreen
 import mx.edu.utez.bitacora.ui.features.evidences.EvidenceScreen
 import mx.edu.utez.bitacora.ui.features.evidences.EvidenceViewModelFactory
 import mx.edu.utez.bitacora.ui.features.home.HomeScreen
+import mx.edu.utez.bitacora.ui.features.home.HomeViewModelFactory
 import mx.edu.utez.bitacora.ui.features.login.LoginScreen
 import mx.edu.utez.bitacora.ui.features.login.LoginViewModelFactory
 import mx.edu.utez.bitacora.ui.features.profile.ProfileScreen
+import mx.edu.utez.bitacora.ui.features.profile.ProfileViewModelFactory
 import mx.edu.utez.bitacora.ui.features.recovery.PasswordRecoveryScreen
 import mx.edu.utez.bitacora.ui.features.recovery.RecoveryViewModelFactory
 import mx.edu.utez.bitacora.ui.features.taskDetails.TaskDetailsViewModelFactory
@@ -85,7 +87,9 @@ fun AppNavigation(dataStoreManager: DataStoreManager) {
                 )
             }
             composable<AuthRoutes.Home> {
-                HomeScreen(onNavigate = { route -> navController.navigate(route){
+                HomeScreen(
+                    viewModel = viewModel( factory = HomeViewModelFactory( dataStoreManager = dataStoreManager ) ),
+                    onNavigate = { route -> navController.navigate(route){
                     popUpTo<AuthRoutes.Home> { saveState = true }
                     restoreState = true
                     launchSingleTop = true
@@ -127,14 +131,21 @@ fun AppNavigation(dataStoreManager: DataStoreManager) {
                 )
             }
             composable<AuthRoutes.Profile> {
-                ProfileScreen(onLogout = {
-                    scope.launch {
-                        dataStoreManager.clearSession()
-                        navController.navigate(Login) {
-                            popUpTo<AuthRoutes.Home> { inclusive = true }
+                ProfileScreen(
+                    onLogout = {
+                        scope.launch {
+                            dataStoreManager.clearSession()
+                            navController.navigate(Login) {
+                                popUpTo<AuthRoutes.Home> { inclusive = true }
+                            }
                         }
-                    }
-                })
+                    },
+                    viewModel = viewModel(
+                        factory = ProfileViewModelFactory(
+                            dataStoreManager = dataStoreManager
+                        )
+                    )
+                )
             }
             composable<Loading>{
                 LoadingScreen()

@@ -61,7 +61,7 @@ fun TaskCard(
                     
                 )
                 Text(
-                    text = "Sistema de gestión escolar",
+                    text = task.projectName,
                     color = MaterialTheme.colorScheme.onSecondary,
                     fontSize = 14.sp
                 )

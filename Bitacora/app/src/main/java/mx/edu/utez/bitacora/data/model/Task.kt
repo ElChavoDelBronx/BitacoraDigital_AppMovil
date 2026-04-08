@@ -10,12 +10,12 @@ data class SimpleTask(
 )
 
 data class Task(
-    var id: Long,
-    var title : String,
-    var projectName: String,
+    var id: Long = 0,
+    var title : String = "",
+    var projectName: String = "",
     var description : String = "",
-    var status : TaskStatus,
-    var dueDate : String,
+    var status : TaskStatus = TaskStatus.Pending,
+    var dueDate : String = "",
     var subTasks : List<Subtask> = emptyList(),
     var evidences: List<Evidence> = emptyList()
 )

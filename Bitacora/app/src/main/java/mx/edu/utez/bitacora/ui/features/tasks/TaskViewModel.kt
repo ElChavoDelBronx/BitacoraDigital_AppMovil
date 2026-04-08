@@ -24,10 +24,13 @@ class TaskViewModel(
     var isLoading by mutableStateOf(false)
         private set
 
+    var isRefreshing by mutableStateOf(false)
+        private set
+
     init {
         observeUserAndLoadTask()
     }
-    private fun observeUserAndLoadTask() {
+    fun observeUserAndLoadTask() {
         viewModelScope.launch {
             dataStoreManager.userIdFlow.collect { id ->
                 Log.d("DEBUG", "ID recibido de DataStore: $id")
@@ -42,6 +45,7 @@ class TaskViewModel(
 
     suspend fun loadTasks(idStudent: Long) {
         viewModelScope.launch {
+            isRefreshing = true
             isLoading = true
             try {
                 val response = apiService.getTasks(idStudent)
@@ -52,6 +56,7 @@ class TaskViewModel(
 
             } finally {
                 isLoading = false
+                isRefreshing = false
             }
         }
     }

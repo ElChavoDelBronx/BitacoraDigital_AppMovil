@@ -140,7 +140,7 @@ fun DetailedTaskScreen(
         if(task?.status == TaskStatus.Pending) {
             Button(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = {},
+                onClick = { viewModel.changeToInProgressStatus() },
                 shape = RoundedCornerShape(10.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0B81B7))
             ) {

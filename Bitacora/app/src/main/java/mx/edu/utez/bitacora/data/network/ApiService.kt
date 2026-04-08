@@ -9,10 +9,12 @@ import mx.edu.utez.bitacora.ui.features.evidences.data.EvidenceRequest
 import mx.edu.utez.bitacora.ui.features.home.data.StudentDashboard
 import mx.edu.utez.bitacora.ui.features.profile.data.ProfileInfo
 import mx.edu.utez.bitacora.ui.features.recovery.data.PasswordResetRequest
+import mx.edu.utez.bitacora.ui.features.taskDetails.requests.UpdateTaskRequest
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface ApiService {
@@ -39,6 +41,9 @@ interface ApiService {
 
     @GET("api/tasks/{taskId}")
     suspend fun getTaskById(@Path("taskId") taskId: Long): Response<DataResponse<Task>>
+
+    @PUT("api/tasks")
+    suspend fun updateTask(@Body request: UpdateTaskRequest): Response<GeneralResponse<Task>>
 
     @POST("api/evidences")
     suspend fun saveEvidence(@Body request: EvidenceRequest): Response<GeneralResponse<Unit>>
